@@ -1,5 +1,6 @@
 package com.example.cchance25.todo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -38,13 +39,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_delete_task).setVisible(false);
+        menu.findItem(R.id.action_save_task).setVisible(false);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_task:
                 addSingleFakeDataRow();
+                Intent i = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(i);
                 return true;
+            default:
+                return false;
         }
-        return true;
     }
 
     private void addSingleFakeDataRow() {

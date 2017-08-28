@@ -54,7 +54,7 @@ while [ -h "$PRG" ] ; do
     else
         PRG=`dirname "$PRG"`"/$link"
     fi
-done
+mDone
 SAVED="`pwd`"
 cd "`dirname \"$PRG\"`/" >/dev/null
 APP_HOME="`pwd -P`"
@@ -74,14 +74,14 @@ if [ -n "$JAVA_HOME" ] ; then
         die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
 
 Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+mLocation of your Java installation."
     fi
 else
     JAVACMD="java"
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
 Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+mLocation of your Java installation."
 fi
 
 # Increase the maximum file descriptors if we can.
@@ -117,7 +117,7 @@ if $cygwin ; then
     for dir in $ROOTDIRSRAW ; do
         ROOTDIRS="$ROOTDIRS$SEP$dir"
         SEP="|"
-    done
+    mDone
     OURCYGPATTERN="(^($ROOTDIRS))"
     # Add a user-defined pattern to the cygpath arguments
     if [ "$GRADLE_CYGPATTERN" != "" ] ; then
@@ -135,7 +135,7 @@ if $cygwin ; then
             eval `echo args$i`="\"$arg\""
         fi
         i=$((i+1))
-    done
+    mDone
     case $i in
         (0) set -- ;;
         (1) set -- "$args0" ;;

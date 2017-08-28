@@ -6,58 +6,59 @@ package com.example.cchance25.todo;
 
 public class TodoItem {
 
-    private String title;
-    private String location;
-    private String description;
-    private int priority;
-    private boolean isDone;
+    private int mId;
+    private String mTitle;
+    private String mLocation;
+    private String mDescription;
+    private int mPriority;
+    private boolean mDone;
 
 
-    public TodoItem(String title, String location, String description, int priority, boolean isDone) {
-        this.title = title;
-        this.location = location;
-        this.description = description;
-        this.priority = priority;
-        this.isDone = isDone;
+    public TodoItem(String mTitle, String mLocation, String mDescription, int mPriority, boolean mDone) {
+        this.mTitle = mTitle;
+        this.mLocation = mLocation;
+        this.mDescription = mDescription;
+        this.mPriority = mPriority;
+        this.mDone = mDone;
     }
 
-    public String getTitle() {
-        return title;
+    public String getmTitle() {
+        return mTitle;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setmTitle(String mTitle) {
+        this.mTitle = mTitle;
     }
 
-    public String getLocation() {
-        return location;
+    public String getmLocation() {
+        return mLocation;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setmLocation(String mLocation) {
+        this.mLocation = mLocation;
     }
 
-    public String getDescription() {
-        return description;
+    public String getmDescription() {
+        return mDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
-    public int getPriority() {
-        return priority;
+    public int getmPriority() {
+        return mPriority;
     }
 
-    public void setPriority(int priority) {
-        this.priority = priority;
+    public void setmPriority(int mPriority) {
+        this.mPriority = mPriority;
     }
 
-    public boolean isDone() {
-        return isDone;
+    public boolean ismDone() {
+        return mDone;
     }
 
-    public void setDone(boolean done) {
-        isDone = done;
+    public void setmDone(boolean mDone) {
+        this.mDone = mDone;
     }
 }

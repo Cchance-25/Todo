@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Todo</string>
+    <string name="todo_title_hint">What do you want to do?</string>
+    <string name="todo_location_hint">Where ?</string>
+    <string name="edit_text_todo_description">Description</string>
+    <string name="tv_priority">Priority</string>
 </resources>
