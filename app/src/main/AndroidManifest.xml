@@ -16,7 +16,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditorActivity"></activity>
+        <activity android:name=".EditorActivity">
+
+        </activity>
+
+        <provider
+            android:name=".Data.TodoProvider"
+            android:authorities="com.example.cchance25.todo"
+            android:exported="false" />
     </application>
 
 </manifest>

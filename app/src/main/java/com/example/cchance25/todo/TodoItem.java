@@ -13,6 +13,8 @@ public class TodoItem {
     private int mPriority;
     private boolean mDone;
 
+    public TodoItem() {
+    }
 
     public TodoItem(String mTitle, String mLocation, String mDescription, int mPriority, boolean mDone) {
         this.mTitle = mTitle;

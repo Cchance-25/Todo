@@ -26,7 +26,6 @@ public class TodoDpHelper extends SQLiteOpenHelper {
 
         String sql = "CREATE TABLE " + TodoEntry.TABLE_NAME + "( "
                 + TodoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + TodoEntry.COLUMN_ITEM_NUMBER + " INTEGER AUTOINCREMENT, "
                 + TodoEntry.COLUMN_ITEM_TITLE + " TEXT NOT NULL, "
                 + TodoEntry.COLUMN_ITEM_LOCATION + " TEXT, "
                 + TodoEntry.COLUMN_ITEM_DESCRIPTION + " TEXT, "
@@ -34,7 +33,7 @@ public class TodoDpHelper extends SQLiteOpenHelper {
                 + TodoContract.NORMAL_PRIORITY + ");";
 
         db.execSQL(sql);
-        Log.i(LOG_TAG, "Database created successfully. ");
+        Log.e(LOG_TAG, "Database created successfully. ");
     }
 
     @Override

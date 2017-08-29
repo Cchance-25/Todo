@@ -57,9 +57,9 @@ public class TodoProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
-                        String.valueOf(TodoEntry.COLUMN_ITEM_PRIORITY),
+                        TodoEntry.COLUMN_ITEM_PRIORITY,
                         null,
-                        "ASC");
+                        sortOrder);
                 break;
             case TODOLIST_ITEM:
                 selection = TodoEntry._ID + "=?";
@@ -109,18 +109,15 @@ public class TodoProvider extends ContentProvider {
             throw new IllegalArgumentException("Todo title must not be empty. ");
         }
 
-        String location = values.getAsString(TodoEntry.COLUMN_ITEM_LOCATION);
-        if (location == null) {
-            location = "Location is empty";
-        }
 
-        String description = values.getAsString(TodoEntry.COLUMN_ITEM_DESCRIPTION);
-        if (description == null) {
-            description = "No description!";
+        int priority = values.getAsInteger(TodoEntry.COLUMN_ITEM_PRIORITY);
+
+        if (!TodoEntry.isValidPriority(priority)) {
+            throw new IllegalArgumentException("Invalid priority detected! ");
         }
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        long id = db.insertOrThrow(TodoEntry.TABLE_NAME, null, values);
+        long id = db.insert(TodoEntry.TABLE_NAME, null, values);
         if (id == 1) {
             Log.e(LOG_TAG, "Failed Adding: " + uri);
             return null;
@@ -164,17 +161,17 @@ public class TodoProvider extends ContentProvider {
         final int match = matcher.match(uri);
         switch (match) {
             case TODOLIST:
-                return updatePet(uri, contentValues, selection, selectionArgs);
+                return updateItem(uri, contentValues, selection, selectionArgs);
             case TODOLIST_ITEM:
                 selection = TodoEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return updatePet(uri, contentValues, selection, selectionArgs);
+                return updateItem(uri, contentValues, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
         }
     }
 
-    private int updatePet(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    private int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         if (values.containsKey(TodoEntry.COLUMN_ITEM_TITLE)) {
             String title = values.getAsString(TodoEntry.COLUMN_ITEM_TITLE);
             if (title == null) {

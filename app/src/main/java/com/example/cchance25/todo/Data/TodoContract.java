@@ -42,9 +42,6 @@ public class TodoContract {
         // Table ID - Type Integer
         public static final String _ID = BaseColumns._ID;
 
-        // _Todo item serial number - Type Integer
-        public static final String COLUMN_ITEM_NUMBER = "number";
-
         // _Todo item title - Type Text
         public static final String COLUMN_ITEM_TITLE = "title";
 

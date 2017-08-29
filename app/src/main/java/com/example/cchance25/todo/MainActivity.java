@@ -1,7 +1,11 @@
 package com.example.cchance25.todo;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -11,15 +15,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.cchance25.todo.Data.TodoContract;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private RecyclerView rv;
     private List<TodoItem> list;
-    private ListAdapter adapter;
-
+    private RecyclerViewCursorAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +32,16 @@ public class MainActivity extends AppCompatActivity {
 
         list = new ArrayList<>();
 
-        setupFakeList();
-        setupRecyclerView();
+        rv = (RecyclerView) findViewById(R.id.rv_todo_list);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        rv.setLayoutManager(llm);
+        rv.setItemAnimator(new DefaultItemAnimator());
+        DividerItemDecoration did = new DividerItemDecoration(rv.getContext(),
+                llm.getOrientation());
+        adapter = new RecyclerViewCursorAdapter(this, null);
+        rv.addItemDecoration(did);
+
 
     }
 
@@ -79,20 +92,37 @@ public class MainActivity extends AppCompatActivity {
         list.add(new TodoItem("Wash the car", "Malaz", "Marn", 9, false));
     }
 
-    private void setupRecyclerView() {
-        rv = (RecyclerView) findViewById(R.id.rv_todo_list);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        rv.setLayoutManager(llm);
-        rv.setItemAnimator(new DefaultItemAnimator());
-        DividerItemDecoration did = new DividerItemDecoration(rv.getContext(),
-                llm.getOrientation());
-        adapter = new ListAdapter(list, this);
-        rv.addItemDecoration(did);
-        rv.setAdapter(adapter);
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                TodoContract.TodoEntry.COLUMN_ITEM_TITLE
+        };
+
+        return new CursorLoader(this,
+                TodoContract.TodoEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 
 
 
 
 }
+
+
+
+
