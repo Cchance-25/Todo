@@ -1,11 +1,16 @@
 package com.example.cchance25.todo;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -18,8 +23,9 @@ import com.example.cchance25.todo.Data.TodoContract.TodoEntry;
 
 import java.util.ArrayList;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    int priority = TodoContract.NORMAL_PRIORITY;
     private EditText mTitleEditText;
     private EditText mLocationEditText;
     private EditText mDescriptionEditText;
@@ -38,6 +44,13 @@ public class EditorActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         mCurrentUri = intent.getData();
+        if (mCurrentUri == null) {
+            setTitle("Add todo");
+        } else {
+            setTitle("Edit todo");
+            getLoaderManager().initLoader(0, null, this);
+        }
+
 
         setupSpinner();
 
@@ -63,7 +76,7 @@ public class EditorActivity extends AppCompatActivity {
                 return false;
             case R.id.action_save_task:
                 saveEntry();
-                // finish();
+                finish();
                 return true;
             case R.id.action_delete_task:
                 deleteTask();
@@ -74,37 +87,30 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
-
     private void saveEntry() {
-
-        TodoItem currentItem = new TodoItem();
-
         String title = mTitleEditText.getText().toString().trim();
         if (TextUtils.isEmpty(title)) {
             Toast.makeText(this, "Title can't be empty", Toast.LENGTH_SHORT).show();
             return;
         }
-        currentItem.setmTitle(title);
 
         String location = mLocationEditText.getText().toString().trim();
         if (TextUtils.isEmpty(location)) {
             location = "No location entered.";
         }
-        currentItem.setmLocation(location);
 
         String description = mDescriptionEditText.getText().toString().trim();
         if (TextUtils.isEmpty(description)) {
             description = "No description entered. ";
         }
-        currentItem.setmDescription(description);
 
         int priority = Integer.parseInt(mPrioritySpinner.getSelectedItem().toString());
 
         ContentValues cv = new ContentValues();
 
-        cv.put(TodoEntry.COLUMN_ITEM_TITLE, currentItem.getmTitle());
-        cv.put(TodoEntry.COLUMN_ITEM_LOCATION, currentItem.getmLocation());
-        cv.put(TodoEntry.COLUMN_ITEM_DESCRIPTION, currentItem.getmDescription());
+        cv.put(TodoEntry.COLUMN_ITEM_TITLE, title);
+        cv.put(TodoEntry.COLUMN_ITEM_LOCATION, location);
+        cv.put(TodoEntry.COLUMN_ITEM_DESCRIPTION, description);
 
         if (priority == TodoContract.HIGHEST_PRIORITY)
             priority = TodoContract.HIGHEST_PRIORITY;
@@ -117,36 +123,37 @@ public class EditorActivity extends AppCompatActivity {
         else
             priority = TodoContract.LOWEST_PRIORITY;
 
-        currentItem.setmPriority(priority);
-        cv.put(TodoEntry.COLUMN_ITEM_PRIORITY, currentItem.getmPriority());
+        cv.put(TodoEntry.COLUMN_ITEM_PRIORITY, priority);
 
         if (mCurrentUri == null) {
             Uri newUri = getContentResolver().insert(TodoEntry.CONTENT_URI, cv);
-
             if (newUri == null) {
                 Toast.makeText(this, "Error saving todo item! ", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Todo item saved. ", Toast.LENGTH_SHORT).show();
             }
         } else {
-
+            Log.e("TAG", "mCurrentUri: (not null)" + mCurrentUri.toString());
             int rowsAffected = getContentResolver().update(mCurrentUri, cv, null, null);
 
             if (rowsAffected == 0) {
                 Toast.makeText(this, "Error updating todo item! ", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Current item changes saved. ", Toast.LENGTH_SHORT).show();
-
             }
-
         }
-
 
     }
 
     private void deleteTask() {
-    }
+        long result = getContentResolver().delete(mCurrentUri, null, null);
+        if (result == -1) {
+            Toast.makeText(this, "Deletion failed! ", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Rows deleted:  " + result, Toast.LENGTH_SHORT).show();
+        }
 
+    }
 
     private void setupSpinner() {
         ArrayList<Integer> priorities = new ArrayList<>();
@@ -164,5 +171,63 @@ public class EditorActivity extends AppCompatActivity {
                         priorities));
         spinner.setSelection(priorities.get(1));
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                TodoEntry._ID,
+                TodoEntry.COLUMN_ITEM_TITLE,
+                TodoEntry.COLUMN_ITEM_DESCRIPTION,
+                TodoEntry.COLUMN_ITEM_LOCATION,
+                TodoEntry.COLUMN_ITEM_PRIORITY
+        };
+
+        // This loader will execute the ContentProvider's query method on a background thread
+        return new CursorLoader(this,   // Parent activity context
+                mCurrentUri,         // Query the content URI for the current pet
+                projection,             // Columns to include in the resulting Cursor
+                null,                   // No selection clause
+                null,                   // No selection arguments
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        // Bail early if the cursor is null or there is less than 1 row in the cursor
+        if (cursor == null || cursor.getCount() < 1) {
+            return;
+        }
+
+        // Proceed with moving to the first row of the cursor and reading data from it
+        // (This should be the only row in the cursor)
+        if (cursor.moveToFirst()) {
+            // Find the columns of pet attributes that we're interested in
+            int titleColumnIndex = cursor.getColumnIndex(TodoEntry.COLUMN_ITEM_TITLE);
+            int descriptionColumnIndex = cursor.getColumnIndex(TodoEntry.COLUMN_ITEM_DESCRIPTION);
+            int locationColumnIndex = cursor.getColumnIndex(TodoEntry.COLUMN_ITEM_LOCATION);
+            int priorityColumnIndex = cursor.getColumnIndex(TodoEntry.COLUMN_ITEM_PRIORITY);
+
+            // Extract out the value from the Cursor for the given column index
+            String title = cursor.getString(titleColumnIndex);
+            String description = cursor.getString(descriptionColumnIndex);
+            String location = cursor.getString(locationColumnIndex);
+            priority = cursor.getInt(priorityColumnIndex);
+
+            // Update the views on the screen with the values from the database
+            mTitleEditText.setText(title);
+            mDescriptionEditText.setText(description);
+            mLocationEditText.setText(location);
+            mPrioritySpinner.setSelection(priority - 1);
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mTitleEditText.setText("");
+        mDescriptionEditText.setText("");
+        mLocationEditText.setText("");
+        mPrioritySpinner.setSelection(2);
     }
 }

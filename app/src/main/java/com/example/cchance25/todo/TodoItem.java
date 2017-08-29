@@ -1,5 +1,7 @@
 package com.example.cchance25.todo;
 
+import android.database.Cursor;
+
 /**
  * Created by Cchance25 on 8/26/2017.
  */
@@ -63,4 +65,12 @@ public class TodoItem {
     public void setmDone(boolean mDone) {
         this.mDone = mDone;
     }
+
+
+    public TodoItem fromCursor(Cursor c) {
+        return this;
+    }
+
+
+
 }

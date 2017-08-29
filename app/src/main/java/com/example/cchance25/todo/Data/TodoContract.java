@@ -57,11 +57,5 @@ public class TodoContract {
         // _Todo item done or not - Type Integer
         public static final String COLUMN_ITEM_DONE = "done";
 
-
-        public static boolean isValidPriority(int priority) {
-            // true, when priority is between 1 and 5
-            return (priority >= 1 && priority <= 5);
-        }
-
     }
 }

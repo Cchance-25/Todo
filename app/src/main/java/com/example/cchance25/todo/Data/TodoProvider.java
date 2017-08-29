@@ -44,13 +44,9 @@ public class TodoProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
-
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         Cursor cursor;
-
         int match = matcher.match(uri);
-
         switch (match) {
             case TODOLIST:
                 cursor = db.query(TodoEntry.TABLE_NAME,
@@ -68,9 +64,9 @@ public class TodoProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
-                        String.valueOf(TodoEntry.COLUMN_ITEM_PRIORITY),
                         null,
-                        "ASC");
+                        null,
+                        null);
                 break;
 
             default:
@@ -82,6 +78,7 @@ public class TodoProvider extends ContentProvider {
 
         return cursor;
     }
+
 
     @Nullable
     @Override
@@ -104,21 +101,15 @@ public class TodoProvider extends ContentProvider {
     }
 
     private Uri insertItem(Uri uri, ContentValues values) {
+        // Don't allow empty titles.
         String title = values.getAsString(TodoEntry.COLUMN_ITEM_TITLE);
         if (title == null) {
             throw new IllegalArgumentException("Todo title must not be empty. ");
         }
 
-
-        int priority = values.getAsInteger(TodoEntry.COLUMN_ITEM_PRIORITY);
-
-        if (!TodoEntry.isValidPriority(priority)) {
-            throw new IllegalArgumentException("Invalid priority detected! ");
-        }
-
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
         long id = db.insert(TodoEntry.TABLE_NAME, null, values);
-        if (id == 1) {
+        if (id == -1) {
             Log.e(LOG_TAG, "Failed Adding: " + uri);
             return null;
         }
@@ -172,6 +163,7 @@ public class TodoProvider extends ContentProvider {
     }
 
     private int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        // Don't allow empty titles
         if (values.containsKey(TodoEntry.COLUMN_ITEM_TITLE)) {
             String title = values.getAsString(TodoEntry.COLUMN_ITEM_TITLE);
             if (title == null) {
@@ -186,7 +178,6 @@ public class TodoProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         int rowsUpdated = database.update(TodoEntry.TABLE_NAME, values, selection, selectionArgs);
-
 
         if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
