@@ -53,7 +53,7 @@ public class TodoProvider extends ContentProvider {
                         projection,
                         selection,
                         selectionArgs,
-                        TodoEntry.COLUMN_ITEM_PRIORITY,
+                        null,
                         null,
                         sortOrder);
                 break;
